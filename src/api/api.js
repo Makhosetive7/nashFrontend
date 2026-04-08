@@ -1,14 +1,14 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api'
 
 const handleResponse = async (response) => {
-  const data = await response.json()
+  const json = await response.json()
   
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || 'Request failed')
+  if (!response.ok || !json.success) {
+    throw new Error(json.message || 'Request failed')
   }
   
-  // Return the full response object, not just data.data
-  return data
+  // Return wrapped response to match component expectations (response.data.data)
+  return { data: json }
 }
 
 // Products API
