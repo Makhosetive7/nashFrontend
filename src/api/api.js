@@ -7,7 +7,8 @@ const handleResponse = async (response) => {
     throw new Error(data.message || 'Request failed')
   }
   
-  return data.data
+  // Return the full response object, not just data.data
+  return data
 }
 
 // Products API
