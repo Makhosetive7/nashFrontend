@@ -1,34 +1,57 @@
-import axios from 'axios';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api';
+const handleResponse = async (response) => {
+  const data = await response.json()
+  
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Request failed')
+  }
+  
+  return data.data
+}
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export const getProducts = async () => {
+  const response = await fetch(`${API_BASE_URL}/get_products.php`)
+  return handleResponse(response)
+}
 
-// Products API
-export const getProducts = () => api.get('/get_products.php');
-export const getProduct = (id) => api.get(`/get_products.php?id=${id}`);
-export const createProduct = (formData) => {
-  return axios.post(`${API_BASE_URL}/create_product.php`, formData, {
+export const createProduct = async (productData) => {
+  const formData = new FormData()
+  Object.keys(productData).forEach(key => {
+    formData.append(key, productData[key])
+  })
+
+  const response = await fetch(`${API_BASE_URL}/create_product.php`, {
+    method: 'POST',
+    body: formData
+  })
+  return handleResponse(response)
+}
+
+export const deleteProduct = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/delete_product.php?id=${id}`, {
+    method: 'DELETE'
+  })
+  return handleResponse(response)
+}
+
+export const getSales = async () => {
+  const response = await fetch(`${API_BASE_URL}/get_sales.php`)
+  return handleResponse(response)
+}
+
+export const createSale = async (saleData) => {
+  const response = await fetch(`${API_BASE_URL}/create_sale.php`, {
+    method: 'POST',
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/json'
     },
-  });
-};
-export const updateProduct = (id, data) => api.put(`/update_products.php?id=${id}`, data);
-export const deleteProduct = (id) => api.delete(`/delete_product.php?id=${id}`);
+    body: JSON.stringify(saleData)
+  })
+  return handleResponse(response)
+}
 
-// Sales API
-export const getSales = () => api.get('/get_sales.php');
-export const createSale = (data) => api.post('/create_sale.php', data);
-export const updateSale = (id, data) => api.put(`/update_sale.php?id=${id}`, data);
-export const deleteSale = (id) => api.delete(`/delete_sale.php?id=${id}`);
-
-// Dashboard API
-export const getDashboard = () => api.get('/dashboard.php');
-
-export default api;
+export const getDashboard = async () => {
+  const response = await fetch(`${API_BASE_URL}/dashboard.php`)
+  return handleResponse(response)
+}
